@@ -1,22 +1,30 @@
-from dataclasses import field
-from pyexpat import model
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import UpdateView, DeleteView, CreateView
 from django.urls import reverse_lazy
 from .models import Article
 
+"""
+use: LoginRequiredMixin
+This is to restrict view access by ensuring that only logged in
+user can be able to view, create, edit or delete an article.
+
+use: UserPassesTestMixin
+This is to ensure that a user can only edit or delete his article
+"""
+
 # Create your views here.
-class ArticleListView(ListView):
+class ArticleListView(LoginRequiredMixin, ListView):
     model = Article
     template_name = "article_list.html"
 
 
-class ArticleDetailView(DetailView):
+class ArticleDetailView(LoginRequiredMixin, DetailView):
     model = Article
     template_name = "article_detail.html"
 
 
-class ArticleUpdateView(UpdateView):
+class ArticleUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Article
     fields = (
         "title",
@@ -24,18 +32,34 @@ class ArticleUpdateView(UpdateView):
     )
     template_name = "article_edit.html"
 
+    # ensure only the the article's author can edit it
+    def test_func(self):
+        obj = self.get_object()
+        return obj.author == self.request.user
 
-class ArticleDeleteView(DeleteView):
+
+class ArticleDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Article
     template_name = "article_delete.html"
     success_url = reverse_lazy("article_list")
 
+    # ensure only the the article's author can delete it
+    def test_func(self):
+        obj = self.get_object()
+        return obj.author == self.request.user
 
-class ArticleCreateView(CreateView):
+
+class ArticleCreateView(LoginRequiredMixin, CreateView):
     model = Article
     template_name = "article_new.html"
     fields = (
         "title",
         "body",
-        "author",
     )
+    # redirect if an unauthenticated user try to access this page
+    redirect_field_name = "login"
+
+    # automatically set author of an article as authenticated user
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
