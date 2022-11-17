@@ -1,0 +1,10 @@
+{
+    "[markdown]": {
+        "editor.wordWrap": "off"
+    },
+    "diffEditor.wordWrap": "inherit",
+    "python.formatting.provider": "black",
+    "html.format.templating": true,
+    "html.format.wrapAttributes": "auto",
+    "html.format.wrapLineLength": 120
+}

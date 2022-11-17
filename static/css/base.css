@@ -1,0 +1,24 @@
+/*  all forms required fields */
+div label span.asteriskField {
+    color: red;
+}
+
+
+/* Navbar styling */
+.brand-logo {
+    width: 120px;
+    height: auto;
+}
+
+.navbar-nav,
+.navbar-brand {
+    margin-left: 13px;
+}
+
+.navbar-2 {
+    margin-right: 13px;
+}
+
+.navbar-2-container {
+    justify-content: flex-end !important;
+}
